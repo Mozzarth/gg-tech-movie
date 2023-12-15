@@ -1,10 +1,34 @@
-import { PaginatedRequest } from 'src/app/shared/domain/pagination';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsBooleanString,
+  IsInt,
+  IsOptional,
+  Min,
+  ValidateIf,
+} from 'class-validator';
 
-export class MovieQueryRequest implements PaginatedRequest {
-  @ApiProperty()
-  page: number;
+export class MovieQueryRequest {
+  @IsOptional()
+  @Transform((input: any) =>
+    input.value == undefined ? null : input.value == 'true',
+  )
+  @ApiPropertyOptional()
+  watched?: boolean;
 
-  @ApiProperty()
-  pageSize: number;
+  @IsInt()
+  @IsOptional()
+  @Type(() => Number)
+  @ApiPropertyOptional()
+  @ValidateIf((object) => object.pageSize !== undefined)
+  @Min(1)
+  page?: number;
+
+  @IsInt()
+  @IsOptional()
+  @Type(() => Number)
+  @ApiPropertyOptional()
+  @ValidateIf((object) => object.page !== undefined)
+  @Min(1)
+  pageSize?: number;
 }

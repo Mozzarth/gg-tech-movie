@@ -1,5 +1,5 @@
-import { PaginatedResponse, Pagination } from '../domain/pagination';
 import { MovieRepository } from '../domain/movie.repository';
+import { PaginatedResponse } from '../domain/pagination';
 import { MovieFindDto } from '../domain/movie.dto';
 import { Injectable } from '@nestjs/common';
 import { Movie } from '../domain/movie';
@@ -12,10 +12,6 @@ import {
 
 @Injectable()
 export class MovieRepositoryMemory implements MovieRepository {
-  constructor() {
-    console.log(MovieRepositoryMemory.name);
-  }
-
   private readonly movies: Map<string, Movie> = new Map();
 
   async create(input: Movie): Promise<void> {
@@ -31,20 +27,6 @@ export class MovieRepositoryMemory implements MovieRepository {
     const moviesArray = this.getMovies();
     return FilterKeyValue.handle(moviesArray, criteria);
   }
-  async find(input: MovieFindDto): Promise<PaginatedResponse<Movie>> {
-    const allMovies = this.getMovies();
-    const { criteria, paginated } = input;
-    const { page, pageSize } = paginated;
-
-    allMovies.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-    const filtered = MovieFilter.handle(allMovies, criteria);
-    const paginatedMovies = MovieGetPaginate.handle(filtered, page, pageSize);
-
-    const pagination = PaginationInfo.handle(filtered.length, page, pageSize);
-
-    return { pagination, data: paginatedMovies };
-  }
-
   async findById(id: string): Promise<Movie | null> {
     return this.movies.get(id) || null;
   }
@@ -55,5 +37,33 @@ export class MovieRepositoryMemory implements MovieRepository {
 
   private getMovies() {
     return Array.from(this.movies.values());
+  }
+
+  /**
+   * Busca películas basadas en los criterios proporcionados y devuelve una respuesta paginada.
+   * @param {MovieFindDto} input - Los criterios de búsqueda y paginación para filtrar y paginar las películas.
+   * @returns {Promise<PaginatedResponse<Movie>>} Una promesa que se resuelve con una respuesta paginada de películas que cumplen con los criterios de búsqueda.
+   */
+  async find(input: MovieFindDto): Promise<PaginatedResponse<Movie>> {
+    /**
+     * @type {Movie[]} allMovies - Todas las películas disponibles en la base de datos.
+     * Se obtienen todas las películas principalmente por su almacenamiento en memoria y formato de representación como un array.
+     * Esto facilita la ordenación y filtrado de las películas.
+     */
+    const allMovies = this.getMovies();
+    const { criteria, paginate } = input;
+
+    /**
+     * Ordena todas las películas por fecha de creación de forma descendente, desde la más reciente hasta la más antigua.
+     * Hacerlo antes de aplicar los filtros garantiza que la salida final esté ordenada en base a la fecha de creación original,
+     * incluso después de aplicar los filtros.
+     */
+    allMovies.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    const filtered = MovieFilter.handle(allMovies, criteria);
+    const paginatedMovies = MovieGetPaginate.handle(filtered, paginate);
+    const pagination = PaginationInfo.handle(filtered.length, paginate);
+
+    return { pagination, data: paginatedMovies };
   }
 }

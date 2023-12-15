@@ -6,6 +6,12 @@ import { MovieCreateInput } from './movie.dto';
 export class MovieCreate {
   constructor(private readonly repository: MovieRepository) {}
 
+  /**
+   * Crea una nueva película utilizando la información proporcionada.
+   * @param {MovieCreateInput} input - La información necesaria para crear la película.
+   * @throws {MovieAlreadyExistsError} Si ya existe una película con el mismo título.
+   * @returns {Promise<Movie>} Una promesa que se resuelve con la película creada.
+   */
   async handle(input: MovieCreateInput) {
     const movie = MovieCreateMapper.build(input);
 

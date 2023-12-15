@@ -6,9 +6,9 @@ export class MovieCreateMapper {
   static build(input: MovieCreateInput): Movie {
     return {
       id: StringHelper.uuid(),
-      watched: false,
       title: input.title,
       createdAt: new Date(),
+      watched: input.watched,
       description: input.description,
     };
   }
