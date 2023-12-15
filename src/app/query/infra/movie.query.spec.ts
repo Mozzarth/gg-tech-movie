@@ -3,6 +3,7 @@ import { MovieQuery } from '../app/movie.query';
 import { PaginatedRequest } from 'src/app/shared/domain/pagination';
 import { Movie } from 'src/app/shared/domain/movie';
 import { PaginatedResponse } from 'src/app/shared/domain/pagination';
+import { MovieFindDto } from 'src/app/shared/domain/movie.dto';
 
 const mockMovieRepository: jest.Mocked<MovieRepository> = {
   findOne: jest.fn(),
@@ -25,9 +26,8 @@ describe('MovieQuery', () => {
   });
 
   it('should query movies with pagination', async () => {
-    const input: PaginatedRequest = {
-      page: 1,
-      pageSize: 10,
+    const input: MovieFindDto = {
+      paginate: { page: 1, pageSize: 10 },
     };
 
     const paginatedMovies: Movie[] = [];
@@ -36,25 +36,22 @@ describe('MovieQuery', () => {
 
     mockMovieRepository.find.mockResolvedValueOnce({
       pagination: {
-        page: input.page,
-        pageSize: input.pageSize,
+        page: input.paginate.page,
+        pageSize: input.paginate.pageSize,
         totalItems,
-        totalPages: Math.ceil(totalItems / input.pageSize),
+        totalPages: Math.ceil(totalItems / input.paginate.pageSize),
       },
       data: paginatedMovies,
     });
 
     const result: PaginatedResponse<Movie> = await movieQuery.handle(input);
 
-    expect(mockMovieRepository.find).toHaveBeenCalledWith({
-      paginated: input,
-      criteria: {},
-    });
+    expect(mockMovieRepository.find).toHaveBeenCalledWith(input);
     expect(result.pagination).toEqual({
-      page: input.page,
-      pageSize: input.pageSize,
+      page: input.paginate.page,
+      pageSize: input.paginate.pageSize,
       totalItems,
-      totalPages: Math.ceil(totalItems / input.pageSize),
+      totalPages: Math.ceil(totalItems / input.paginate.pageSize),
     });
     expect(result.data).toEqual(paginatedMovies);
   });

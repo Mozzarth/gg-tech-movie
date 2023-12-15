@@ -27,7 +27,7 @@ Para ejecutar la aplicación en un entorno productivo utilizando npm, utiliza el
 npm run start:prod
 ```
 
-Para ejecutar la aplicación en un contenedor Docker, asegúrate de tener Docker y docker-compose instalados. Luego, ejecuta el siguiente comando:
+Si deseas ejecutar la aplicación con Docker, asegúrate de tener Docker y docker-compose instalados. Luego, ejecuta el siguiente comando:
 
 ```bash
 docker-compose up -d

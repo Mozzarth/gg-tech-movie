@@ -30,6 +30,7 @@ describe('MovieCreate', () => {
   it('should create a movie when there is no existing movie with the same title', async () => {
     const input: MovieCreateInput = {
       title: 'title',
+      watched: false,
       description: 'description',
     };
 
@@ -57,6 +58,7 @@ describe('MovieCreate', () => {
   it('should throw an error when there is an existing movie with the same title', async () => {
     const input: MovieCreateInput = {
       title: 'title',
+      watched: false,
       description: 'description',
     };
 

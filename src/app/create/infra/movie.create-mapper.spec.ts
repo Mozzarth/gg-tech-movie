@@ -11,6 +11,7 @@ jest.mock('../../../shared/app/string.helper', () => ({
 describe('MovieCreateMapper', () => {
   it('should map MovieCreateInput to Movie', () => {
     const input: MovieCreateInput = {
+      watched: false,
       title: 'Test Movie',
       description: 'Test Description',
     };
